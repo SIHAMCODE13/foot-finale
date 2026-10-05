@@ -5,6 +5,7 @@ C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\security\JwtRequestFilter.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\model\User.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\controller\AdminHomeMessageController.java
+C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\config\ActivateExistingPasswordUsersRunner.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\dto\EvolutionDTO.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\dto\ChatMessageDto.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\util\EncryptionConverter.java
@@ -47,6 +48,7 @@ C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\dto\DocumentStatusRequest.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\security\InputSanitizer.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\service\CotisationService.java
+C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\config\DemoDataSeeder.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\dto\DocumentPresentationStatus.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\security\SecurityHeadersFilter.java
 C:\Users\hp\Desktop\club\CLUB\club-foot-app-main\backend\src\main\java\com\club\security\AuthRateLimitFilter.java

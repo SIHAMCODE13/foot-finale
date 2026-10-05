@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,21 +47,17 @@ public class AdminUserService {
         user.setRegistrationStatus(RegistrationStatus.PENDING);
         user.setDateInscription(java.time.LocalDateTime.now());
 
-        // Handle password
-        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-            // Password provided - encode it and activate account
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setActif(true);
-            user.setAccountStatus(User.AccountStatus.ACTIF);
-            user.setActivationToken(null);
-        } else {
-            // No password - use activation flow
-            String activationToken = UUID.randomUUID().toString();
-            user.setPassword(null);
-            user.setActif(false);
-            user.setAccountStatus(User.AccountStatus.ACTIVATION_REQUISE);
-            user.setActivationToken(activationToken);
+        // Compte immédiatement actif : mot de passe obligatoire (pas d'activation)
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Le mot de passe est obligatoire");
         }
+        if (request.getPassword().trim().length() < 6) {
+            throw new IllegalArgumentException("Le mot de passe doit contenir au moins 6 caractères");
+        }
+        user.setPassword(passwordEncoder.encode(request.getPassword().trim()));
+        user.setActif(true);
+        user.setAccountStatus(User.AccountStatus.ACTIF);
+        user.setActivationToken(null);
 
         // Set equipeId and poste for JOUEUR role
         if (request.getRole() == User.Role.JOUEUR) {
@@ -70,14 +65,7 @@ public class AdminUserService {
             user.setPoste(request.getPoste());
         }
 
-        User savedUser = userRepository.save(user);
-        
-        // TODO: Send activation email with link if no password provided
-        // if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
-        //     emailService.sendActivationEmail(user.getEmail(), activationToken);
-        // }
-        
-        return savedUser;
+        return userRepository.save(user);
     }
 
     public List<User> getAllUsers() {

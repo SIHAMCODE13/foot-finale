@@ -38,20 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // Check if login was successful
       if (result is Map && result['success'] == true) {
         Navigator.pushReplacementNamed(context, '/home');
-      } 
-      // Check if account needs activation
-      else if (result is Map && result['needsActivation'] == true) {
-        Navigator.pushNamed(
-          context,
-          '/activate-account',
-          arguments: {
-            'email': result['email'],
-            'activationToken': result['activationToken'],
-          },
-        );
-      } 
-      // Login failed
-      else {
+      } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(

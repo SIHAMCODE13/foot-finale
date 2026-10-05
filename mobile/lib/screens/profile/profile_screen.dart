@@ -334,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ListTile(
           contentPadding: EdgeInsets.zero,
           leading: const Icon(Icons.lock_reset),
-          title: const Text('Changer le mot de passe', style: TextStyle(fontSize: 15)),
+          title: const Text('Changer mon mot de passe', style: TextStyle(fontSize: 15)),
           trailing: const Icon(Icons.chevron_right),
           onTap: _showChangePasswordDialog,
         ),
@@ -356,46 +356,126 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showChangePasswordDialog() {
+    final formKey = GlobalKey<FormState>();
+    final currentCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+    bool obscureCurrent = true;
+    bool obscureNew = true;
+    bool obscureConfirm = true;
+    bool submitting = false;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.masBlack,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Sécurité', style: TextStyle(color: AppTheme.masYellow)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Pour changer votre mot de passe, un lien de réinitialisation vous sera envoyé par email.',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: AppTheme.masBlack,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Changer mon mot de passe', style: TextStyle(color: AppTheme.masYellow)),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: currentCtrl,
+                  obscureText: obscureCurrent,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: AppTheme.inputDecoration('Mot de passe actuel', Icons.lock_outline).copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(obscureCurrent ? Icons.visibility : Icons.visibility_off, color: Colors.white54),
+                      onPressed: () => setDialogState(() => obscureCurrent = !obscureCurrent),
+                    ),
+                  ),
+                  validator: (v) => (v == null || v.isEmpty) ? 'Requis' : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: newCtrl,
+                  obscureText: obscureNew,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: AppTheme.inputDecoration('Nouveau mot de passe', Icons.lock).copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(obscureNew ? Icons.visibility : Icons.visibility_off, color: Colors.white54),
+                      onPressed: () => setDialogState(() => obscureNew = !obscureNew),
+                    ),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Requis';
+                    if (v.length < 6) return 'Au moins 6 caractères';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: confirmCtrl,
+                  obscureText: obscureConfirm,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: AppTheme.inputDecoration('Confirmer le nouveau mot de passe', Icons.lock).copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(obscureConfirm ? Icons.visibility : Icons.visibility_off, color: Colors.white54),
+                      onPressed: () => setDialogState(() => obscureConfirm = !obscureConfirm),
+                    ),
+                  ),
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return 'Requis';
+                    if (v != newCtrl.text) return 'Les mots de passe ne correspondent pas';
+                    return null;
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            TextField(
-              decoration: AppTheme.inputDecoration('Votre Email', Icons.email_outlined),
-              style: const TextStyle(color: Colors.white),
-              readOnly: true,
-              controller: TextEditingController(text: email),
+          ),
+          actions: [
+            TextButton(
+              onPressed: submitting ? null : () => Navigator.pop(dialogContext),
+              child: const Text('Annuler', style: TextStyle(color: Colors.white54)),
+            ),
+            ElevatedButton(
+              onPressed: submitting
+                  ? null
+                  : () async {
+                      if (!(formKey.currentState?.validate() ?? false)) return;
+                      setDialogState(() => submitting = true);
+                      final auth = Provider.of<AuthProvider>(this.context, listen: false);
+                      final ok = await auth.changePassword(
+                        currentPassword: currentCtrl.text,
+                        newPassword: newCtrl.text,
+                        confirmPassword: confirmCtrl.text,
+                      );
+                      if (!mounted) return;
+                      if (ok) {
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          const SnackBar(content: Text('Mot de passe modifié avec succès')),
+                        );
+                      } else {
+                        setDialogState(() => submitting = false);
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          SnackBar(
+                            content: Text(auth.error ?? 'Impossible de modifier le mot de passe'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.masYellow),
+              child: submitting
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.masBlack),
+                    )
+                  : const Text('Enregistrer', style: TextStyle(color: AppTheme.masBlack, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler', style: TextStyle(color: Colors.white54)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Lien envoyé avec succès')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.masYellow),
-            child: const Text('Envoyer le lien', style: TextStyle(color: AppTheme.masBlack, fontWeight: FontWeight.bold)),
-          ),
-        ],
       ),
-    );
+    ).whenComplete(() {
+      currentCtrl.dispose();
+      newCtrl.dispose();
+      confirmCtrl.dispose();
+    });
   }
 
   Future<void> _pickAndUploadPhoto(AuthProvider auth) async {

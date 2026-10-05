@@ -63,4 +63,26 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("error", com.club.exception.SafeErrorMessages.UPLOAD_FAILED));
         }
     }
+
+    @PostMapping("/me/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body,
+            Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("error", com.club.exception.SafeErrorMessages.ACCESS_DENIED));
+        }
+        try {
+            User current = (User) authentication.getPrincipal();
+            userService.changePassword(
+                    current.getEmail(),
+                    body != null ? body.get("currentPassword") : null,
+                    body != null ? body.get("newPassword") : null,
+                    body != null ? body.get("confirmPassword") : null);
+            return ResponseEntity.ok(Map.of("message", "Mot de passe modifié avec succès"));
+        } catch (com.club.exception.BusinessException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", com.club.exception.SafeErrorMessages.sanitizeBusinessMessage(e.getMessage())));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", com.club.exception.SafeErrorMessages.OPERATION_FAILED));
+        }
+    }
 }

@@ -64,6 +64,7 @@ com\club\model\InjurySuspension.class
 com\club\controller\EncadrantCotisationController.class
 com\club\exception\FileSizeExceededException.class
 com\club\model\User$Role.class
+com\club\config\DemoDataSeeder.class
 com\club\config\InscritRoleCleanupRunner.class
 com\club\controller\AdminHomeMessageController.class
 com\club\repository\DocumentTypeConfigRepository.class
@@ -110,6 +111,7 @@ com\club\service\RecuUploadService.class
 com\club\dto\DocumentResponse$DocumentResponseBuilder.class
 com\club\dto\RevenuMensuelDTO.class
 com\club\controller\InjurySuspensionController.class
+com\club\config\ActivateExistingPasswordUsersRunner.class
 com\club\model\Match$TypeMatch.class
 com\club\service\DashboardService.class
 com\club\model\Joueur.class

@@ -27,20 +27,6 @@ class AuthProvider extends ChangeNotifier {
     try {
       final response = await ApiService.login(email, password);
       
-      // Check if account needs activation
-      if (response['needsActivation'] == true) {
-        _isLoading = false;
-        notifyListeners();
-        return {
-          'success': false,
-          'needsActivation': true,
-          'activationToken': response['activationToken'],
-          'email': response['email'],
-          'message': response['message'],
-        };
-      }
-      
-      // Normal login success
       _user = User.fromJson(response['user']);
       _token = response['token'];
       
@@ -63,39 +49,26 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Activate account with new password
-  Future<bool> activateAccount({
-    required String email,
-    required String password,
-    required String activationToken,
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
   }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final response = await ApiService.activateAccount(
-        email: email,
-        password: password,
-        activationToken: activationToken,
+      await ApiService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
       );
-      
-      _user = User.fromJson(response['user']);
-      _token = response['token'];
-      
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('userId', _user!.id.toString());
-      await prefs.setString('userRole', _user!.role);
-      await prefs.setString('token', _token!);
-      if (_user!.equipeId != null) {
-        await prefs.setString('userEquipeId', _user!.equipeId.toString());
-      }
-      
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
-      _error = ApiErrorUtils.sanitizeForDisplay(e, fallback: ApiErrorUtils.generic);
+      _error = ApiErrorUtils.sanitizeForDisplay(e, fallback: 'Impossible de modifier le mot de passe');
       _isLoading = false;
       notifyListeners();
       return false;

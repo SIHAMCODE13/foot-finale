@@ -28,9 +28,14 @@ public class AdminUserController {
      * Create a new user (Player, Coach, or Member)
      */
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request) {
-        User user = adminUserService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    public ResponseEntity<?> createUser(@RequestBody CreateUserRequest request) {
+        try {
+            User user = adminUserService.createUser(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", com.club.exception.SafeErrorMessages.sanitizeBusinessMessage(e.getMessage())));
+        }
     }
     
     /**

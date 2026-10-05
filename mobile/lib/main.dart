@@ -14,7 +14,6 @@ import 'providers/theme_provider.dart';
 import 'providers/document_provider.dart' as original_doc;
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
-import 'screens/auth/activate_account_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/users/users_screen.dart';
 import 'screens/equipes/equipes_screen.dart';
@@ -77,7 +76,6 @@ class MyApp extends StatelessWidget {
             routes: {
               '/login': (context) => const LoginScreen(),
               '/register': (context) => const RegisterScreen(),
-              '/activate-account': (context) => const ActivateAccountScreen(),
               '/home': (context) => const HomeScreen(),
               '/users': (context) => const UsersScreen(),
               '/equipes': (context) => const EquipesScreen(),

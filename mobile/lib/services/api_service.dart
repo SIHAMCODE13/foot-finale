@@ -35,70 +35,6 @@ class ApiService {
   }
 
   // ==================== AUTH ====================
-  
-  // Check if account needs activation
-  static Future<Map<String, dynamic>> checkActivationStatus(String email) async {
-    print('Vérification du statut d\'activation pour: $email');
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/auth/check-status'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email}),
-      );
-
-      print('Réponse check-status: Status=${response.statusCode}');
-      
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception(ApiErrorUtils.fromHttpResponse(
-          response.statusCode,
-          response.body,
-          fallback: 'Échec de vérification du compte',
-        ));
-      }
-    } catch (e) {
-      print('Exception lors de la vérification: $e');
-      rethrow;
-    }
-  }
-
-  // Activate account with new password
-  static Future<Map<String, dynamic>> activateAccount({
-    required String email,
-    required String password,
-    required String activationToken,
-  }) async {
-    print('Activation du compte pour: $email');
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/auth/activate'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'activationToken': activationToken,
-        }),
-      );
-
-      print('Réponse activation: Status=${response.statusCode}');
-      
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        await saveToken(data['token']);
-        return data;
-      } else {
-        throw Exception(ApiErrorUtils.fromHttpResponse(
-          response.statusCode,
-          response.body,
-          fallback: 'Échec d\'activation du compte',
-        ));
-      }
-    } catch (e) {
-      print('Exception lors de l\'activation: $e');
-      rethrow;
-    }
-  }
 
   static Future<Map<String, dynamic>> login(String email, String password) async {
     print('Tentative de connexion à: ${ApiConfig.login} pour: $email');
@@ -115,23 +51,6 @@ class ApiService {
         final data = jsonDecode(response.body);
         await saveToken(data['token']);
         return data;
-      } else if (response.statusCode == 403) {
-        // Account needs activation
-        final data = jsonDecode(response.body);
-        if (data['needsActivation'] == true) {
-          // Return activation data to frontend
-          return {
-            'needsActivation': true,
-            'activationToken': data['activationToken'],
-            'email': email,
-            'message': data['message'] ?? 'Compte non activé',
-          };
-        }
-        throw Exception(ApiErrorUtils.fromHttpResponse(
-          response.statusCode,
-          response.body,
-          fallback: ApiErrorUtils.authFailed,
-        ));
       } else {
         throw Exception(ApiErrorUtils.fromHttpResponse(
           response.statusCode,
@@ -142,6 +61,30 @@ class ApiService {
     } catch (e) {
       print('Exception lors de la connexion: $e');
       rethrow;
+    }
+  }
+
+  static Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    final response = await http.post(
+      Uri.parse(ApiConfig.changePassword),
+      headers: await getHeaders(),
+      body: jsonEncode({
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+        'confirmPassword': confirmPassword,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(ApiErrorUtils.fromHttpResponse(
+        response.statusCode,
+        response.body,
+        fallback: 'Impossible de modifier le mot de passe',
+      ));
     }
   }
 

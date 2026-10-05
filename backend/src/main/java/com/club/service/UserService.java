@@ -11,10 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -53,78 +50,40 @@ public class UserService implements UserDetailsService {
                         throw new BusinessException("Email déjà utilisé");
                 }
 
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-                user.setRole(User.Role.ADHERENT);
-                user.setRegistrationStatus(RegistrationStatus.PENDING);
-                user.setDateInscription(LocalDateTime.now());
-                return userRepository.save(user);
-        }
-
-        public User createUserByAdmin(User user) {
-                if (userRepository.existsByEmail(user.getEmail())) {
-                        throw new BusinessException("Email déjà utilisé");
-                }
-
-                // Generate unique activation token
-                String activationToken = UUID.randomUUID().toString();
-                
-                user.setPassword(null);  // No initial password
-                user.setActif(false);
-                user.setAccountStatus(User.AccountStatus.ACTIVATION_REQUISE);
-                user.setRegistrationStatus(RegistrationStatus.PENDING);
-                user.setActivationToken(activationToken);
-                user.setDateInscription(LocalDateTime.now());
-                
-                return userRepository.save(user);
-        }
-
-        // Activate account on first login
-        public User activateAccount(String email, String newPassword, String activationToken) {
-                User user = userRepository.findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
-
-                // Verify token
-                if (!activationToken.equals(user.getActivationToken())) {
-                        throw new BusinessException("Token d'activation invalide");
-                }
-
-                // Check if account needs activation
-                if (user.getAccountStatus() != User.AccountStatus.ACTIVATION_REQUISE) {
-                        throw new BusinessException("Ce compte est déjà activé");
-                }
-
-                // Validate password
-                if (newPassword == null || newPassword.length() < 6) {
+                if (user.getPassword() == null || user.getPassword().length() < 6) {
                         throw new BusinessException("Le mot de passe doit contenir au moins 6 caractères");
                 }
 
-                // Activate the account
-                user.setPassword(passwordEncoder.encode(newPassword));
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+                user.setRole(User.Role.ADHERENT);
                 user.setActif(true);
                 user.setAccountStatus(User.AccountStatus.ACTIF);
-                user.setActivationToken(null);  // Remove token after activation
-                user.setDerniereConnexion(LocalDateTime.now());
-
+                user.setActivationToken(null);
+                user.setRegistrationStatus(RegistrationStatus.PENDING);
+                user.setDateInscription(LocalDateTime.now());
                 return userRepository.save(user);
         }
 
-        // Check if user needs activation
-        public Map<String, Object> checkActivationStatus(String email) {
-                return userRepository.findByEmail(email)
-                                .map(user -> {
-                                        Map<String, Object> response = new HashMap<>();
-                                        if (user.getAccountStatus() == User.AccountStatus.ACTIVATION_REQUISE) {
-                                                response.put("needsActivation", true);
-                                                response.put("activationToken", user.getActivationToken());
-                                        } else {
-                                                response.put("needsActivation", false);
-                                        }
-                                        response.put("message", com.club.exception.SafeErrorMessages.OPERATION_FAILED);
-                                        return response;
-                                })
-                                .orElseGet(() -> Map.of(
-                                                "needsActivation", false,
-                                                "message", com.club.exception.SafeErrorMessages.OPERATION_FAILED));
+        /**
+         * Change le mot de passe de l'utilisateur connecté.
+         */
+        public void changePassword(String email, String currentPassword, String newPassword, String confirmPassword) {
+                if (newPassword == null || newPassword.length() < 6) {
+                        throw new BusinessException("Le mot de passe doit contenir au moins 6 caractères");
+                }
+                if (confirmPassword == null || !newPassword.equals(confirmPassword)) {
+                        throw new BusinessException("La confirmation du mot de passe ne correspond pas");
+                }
+
+                User user = userRepository.findByEmail(email)
+                                .orElseThrow(() -> new BusinessException("Utilisateur non trouvé"));
+
+                if (user.getPassword() == null || !passwordEncoder.matches(currentPassword, user.getPassword())) {
+                        throw new BusinessException("Mot de passe actuel incorrect");
+                }
+
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
         }
 
         public User createUser(User user) {
