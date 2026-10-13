@@ -20,9 +20,7 @@
 [![License](https://img.shields.io/badge/License-Academic-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-# ⚽ Club Foot App — MAS de Fès
-
-> Application multiplateforme de gestion du club de football **Maghreb Association Sportive (MAS) de Fès**
+</div>
 
 ---
 
@@ -60,127 +58,20 @@ Développée dans le cadre d'un **Projet de Fin d'Année (PFA)** à l'École Nat
 ---
 
 ## 🏗️ Architecture
-┌────────────────────┐ REST/JSON + JWT ┌──────────────────────┐
-│ Flutter Client │ ──────────────────► │ Spring Boot API │
-│ (mobile/web/desktop)│ ◄────────────────── │ (context-path /api) │
-└─────────┬──────────┘ WebSocket/STOMP └──────────┬───────────┘
-│ │ JDBC
-│ ▼
-│ ┌──────────────┐
-│ │ MySQL 8.0 │
-│ └──────────────┘
-│ │
-│ ▼
-│ ┌──────────────┐
-└──────────────────────────────────►│ Stockage │
-│ local (uploads/)│
-└──────────────┘
 
-text
-
----
-
-## 📁 Structure du projet
-club-foot-app/
-├── backend/ # API Spring Boot
-│ ├── src/main/java/
-│ │ ├── controller/ # Contrôleurs REST
-│ │ ├── service/ # Logique métier
-│ │ ├── repository/ # Interfaces JPA
-│ │ ├── model/ # Entités JPA
-│ │ ├── dto/ # Objets de transfert
-│ │ ├── security/ # JWT, filtres, chiffrement
-│ │ ├── exception/ # Gestion centralisée des erreurs
-│ │ └── config/ # WebSocket, données initiales
-│ ├── src/main/resources/
-│ │ └── db/migration/ # Scripts SQL de migration
-│ └── uploads/ # Stockage local des fichiers
-├── frontend/ # Application Flutter
-│ └── lib/
-│ ├── config/ # URLs API centralisées
-│ ├── core/theme/ # Thèmes clair/sombre
-│ ├── models/ # Modèles de données
-│ ├── providers/ # Gestion d'état (Provider)
-│ ├── services/ # Appels HTTP
-│ ├── screens/ # Écrans par domaine métier
-│ └── widgets/ # Composants réutilisables
-├── .github/workflows/ # Pipelines CI/CD
-├── docker-compose.yml # Orchestration MySQL + backend
-└── .env.example # Modèle de variables d'environnement
-
-text
-
----
-
-## 🚀 Lancement rapide
-
-### Prérequis
-
-- [Docker](https://docs.docker.com/get-docker/) & Docker Compose
-- [Flutter SDK](https://docs.flutter.dev/get-started/install) ≥ 3.0
-- [Java 17](https://adoptium.net/) (pour le développement backend)
-
-### Démarrage
-
-```bash
-# 1. Cloner le dépôt
-git clone https://github.com/firdawsM7/club-foot-app.git
-cd club-foot-app
-
-# 2. Configurer les variables d'environnement
-cp .env.example .env
-# Éditer .env selon votre configuration
-
-# 3. Démarrer l'infrastructure (MySQL + backend)
-docker compose up -d
-
-# 4. Lancer le frontend Flutter
-cd frontend
-flutter pub get
-flutter run
-Note : l'URL de l'API est configurée automatiquement selon la plateforme :
-
-http://localhost:8084 → Web, Desktop, iOS
-
-http://10.0.2.2:8084 → Émulateur Android
-
-🔒 Sécurité
-Authentification JWT (expiration 24 h)
-
-Hashage des mots de passe avec BCrypt
-
-Validation et sanitisation des entrées (InputSanitizer)
-
-Protection contre le path traversal
-
-Rate limiting sur l'authentification (30 req / 60 s)
-
-CORS restreint
-
-Messages d'erreur génériques (pas de fuite d'information technique)
-
-🧪 Tests
-Tests unitaires : JwtUtil, MultiPasswordEncoder, SecureFileValidator, InputSanitizer, services métier
-
-Tests d'intégration : messagerie temps réel et notifications
-
-Tests de validation API : authentification, autorisation par rôle, CRUD, upload
-
-Tous les tests sont exécutés automatiquement dans le pipeline CI GitHub Actions.
-
-🔄 CI/CD
-Pipeline	Rôle
-CI (.github/workflows/ci.yml)	Build Maven + tests backend · Build image Docker · Build Flutter Web
-CD (.github/workflows/cd.yml)	Build & push de l'image Docker · Déploiement
-👥 Auteurs
-Siham TALBI
-
-Firdaws MASROUR
-
-Encadrant professionnel : M. Mohammed EL MOUTAOUKIL
-Organisme d'accueil : MAS de Fès
-Établissement : École Nationale des Sciences Appliquées — Filière 3IACN
-
-📄 Licence
-Projet académique — École Nationale des Sciences Appliquées, 2026-2027.
-
+```text
+┌──────────────────────┐   REST/JSON + JWT   ┌──────────────────────┐
+│   Flutter Client     │ ──────────────────► │   Spring Boot API    │
+│ (mobile/web/desktop) │ ◄────────────────── │  (context-path /api) │
+└──────────┬───────────┘   WebSocket/STOMP   └──────────┬───────────┘
+           │                                           │ JDBC
+           │                                           ▼
+           │                                   ┌──────────────┐
+           │                                   │   MySQL 8.0  │
+           │                                   └──────┬───────┘
+           │                                          │
+           │                                          ▼
+           │                                   ┌──────────────┐
+           └──────────────────────────────────►│   Stockage   │
+                                               │ local (uploads/) │
+                                               └──────────────┘
