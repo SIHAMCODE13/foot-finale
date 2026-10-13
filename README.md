@@ -20,166 +20,167 @@
 [![License](https://img.shields.io/badge/License-Academic-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-**Projet de Fin d'Année — ENSA, filière 3IACN (2026-2027)**
+# ⚽ Club Foot App — MAS de Fès
 
-[Présentation](#-présentation) · [Fonctionnalités](#-fonctionnalités) · [Architecture](#-architecture) · [Installation](#-installation) · [Documentation](#-documentation) · [Auteurs](#-auteurs)
-
-</div>
-
----
-
-## 📋 Table des matières
-
-- [Présentation](#-présentation)
-- [Contexte](#-contexte)
-- [Fonctionnalités](#-fonctionnalités)
-- [Stack technique](#-stack-technique)
-- [Architecture](#-architecture)
-- [Structure du projet](#-structure-du-projet)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [Utilisation](#-utilisation)
-- [API REST](#-api-rest)
-- [Tests](#-tests)
-- [CI/CD](#-cicd)
-- [Sécurité](#-sécurité)
-- [Roadmap](#-roadmap)
-- [Contribution](#-contribution)
-- [Auteurs](#-auteurs)
-- [Licence](#-licence)
+> Application multiplateforme de gestion du club de football **Maghreb Association Sportive (MAS) de Fès**
 
 ---
 
 ## 📖 Présentation
 
-**Club Foot App** est une application multiplateforme de gestion conçue pour le club de football **Maghreb Association Sportive (MAS) de Fès**, l'un des clubs les plus prestigieux du football marocain, fondé en 1946 et évoluant en Botola Pro D1 Inwi.
+**Club Foot App** est une application de gestion conçue pour digitaliser l'ensemble des processus administratifs et sportifs du club **MAS de Fès**. Elle centralise les données relatives aux adhérents, joueurs, équipes, entraînements, matchs, cotisations et documents administratifs, et offre un canal de communication interne en temps réel.
 
-L'application répond à un besoin de **digitalisation de la gestion administrative et sportive** du club en centralisant l'ensemble de ses processus :
-
-- Suivi des adhérents et des joueurs
-- Gestion des équipes et du calendrier sportif
-- Suivi financier des cotisations
-- Gestion documentaire (licences, certificats médicaux, pièces d'identité)
-- Communication interne en temps réel
-
-> **Objectif :** doter le club d'un outil numérique moderne, centralisé et sécurisé, adapté à sa dimension sportive et à ses contraintes administratives.
+Développée dans le cadre d'un **Projet de Fin d'Année (PFA)** à l'École Nationale des Sciences Appliquées — filière **3IACN** (2026-2027).
 
 ---
 
-## 🎯 Contexte
+## 🎯 Fonctionnalités
 
-Le MAS de Fès a engagé une **réforme structurelle profonde** de sa gouvernance : augmentation de capital à 200 MDH, budget de fonctionnement porté de 33 à 51 MDH, reconstruction du stade Hassan II (400 MDH) et création d'un centre de formation (100 MDH).
-
-À mesure que le club se professionnalise, les besoins en gestion administrative et sportive augmentent considérablement. La gestion manuelle (registres papier, tableurs partagés) montre ses limites :
-
-- ❌ Dispersion des informations
-- ❌ Absence de traçabilité
-- ❌ Communication inefficace
-- ❌ Manque d'outils de pilotage
-- ❌ Gestion insuffisante des rôles et droits d'accès
-
-**Club Foot App** répond à ces problématiques par une solution centralisée, sécurisée et accessible.
-
----
-
-## ✨ Fonctionnalités
-
-### 🔐 Authentification & Gestion des utilisateurs
-- Authentification par email/mot de passe avec **JWT** (expiration 24 h)
-- Création de comptes par l'administrateur avec mot de passe initial
-- Activation automatique du compte
-- Gestion fine de **4 rôles** : `ADMIN`, `ENCADRANT`, `ADHERENT`, `JOUEUR`
-- Consultation et modification du profil
-- Changement de mot de passe
-
-### 🏆 Gestion sportive
-- **Équipes** : création, affectation d'un encadrant, catégories d'âge
-- **Joueurs** : affectation à une équipe, poste, numéro de maillot
-- **Entraînements** : planification (date, lieu, objectif)
-- **Matchs** : adversaire, scores, date
-
-### 💰 Gestion financière
-- Création et suivi des cotisations
-- Upload de justificatifs de paiement
-- Workflow de validation (EN_ATTENTE → VALIDEE / REJETEE)
-- Statistiques financières (revenus mensuels)
-
-### 📄 Gestion documentaire
-- Upload de documents administratifs (CIN, certificats médicaux, licences fédérales)
-- Configuration des pièces requises par rôle
-- Workflow de validation avec motif de rejet
-
-### 💬 Communication
-- **Chat temps réel par équipe** (WebSocket/STOMP)
-- Messagerie privée avec l'administrateur
-- Annonces et broadcasts globaux
-- Notifications de messages
-
-### 📊 Tableau de bord administrateur
-- Statistiques globales (adhérents, joueurs, équipes)
-- Évolution de l'activité
-- Revenus mensuels (graphiques `fl_chart`)
+- 🔐 **Authentification sécurisée** (JWT, BCrypt) avec 4 rôles : `ADMIN`, `ENCADRANT`, `ADHERENT`, `JOUEUR`
+- 👥 **Gestion des utilisateurs** : création de comptes, rôles, profils, activation automatique
+- 🏆 **Gestion sportive** : équipes, joueurs, entraînements, matchs
+- 💰 **Gestion financière** : cotisations, upload de justificatifs, workflow de validation
+- 📄 **Gestion documentaire** : pièces d'identité, certificats médicaux, licences fédérales
+- 💬 **Communication** : chat temps réel par équipe (WebSocket/STOMP), messagerie privée, annonces
+- 📊 **Tableau de bord administrateur** : statistiques, revenus mensuels, graphiques
+- 🔔 **Notifications** : broadcast, groupe, privé
 
 ---
 
 ## 🛠️ Stack technique
 
-<table>
-<tr>
-<td valign="top" width="33%">
-
-### Backend
-- **Java 17**
-- **Spring Boot 3.2.0**
-- Spring Security
-- Spring Data JPA / Hibernate
-- JJWT 0.11.5
-- Spring WebSocket (STOMP)
-- Lombok
-- Maven
-- MySQL Connector/J
-
-</td>
-<td valign="top" width="33%">
-
-### Frontend
-- **Flutter (Dart SDK ≥ 3.0)**
-- Provider ~6.1.1
-- http ~1.1.0
-- stomp_dart_client ~1.0.0
-- shared_preferences ~2.2.2
-- fl_chart ~0.66.0
-- flutter_spinkit
-- image_picker / file_picker
-- flutter_pdfview / open_file
-- intl ~0.19.0
-
-</td>
-<td valign="top" width="33%">
-
-### DevOps & Outils
-- **Docker** (multi-stage build)
-- **Docker Compose**
-- **GitHub Actions** (CI/CD)
-- **MySQL 8.0**
-- Git / GitHub
-- VS Code / IntelliJ IDEA
-- JUnit 5 / Mockito
-
-</td>
-</tr>
-</table>
+| Couche | Technologies |
+|---|---|
+| **Backend** | Java 17 · Spring Boot 3.2 · Spring Security · JWT · Spring Data JPA · Hibernate · WebSocket/STOMP |
+| **Frontend** | Flutter (Dart) · Provider · http · stomp_dart_client · fl_chart |
+| **Base de données** | MySQL 8.0 |
+| **DevOps** | Docker · Docker Compose · GitHub Actions · Maven |
+| **Tests** | JUnit 5 · Mockito · Spring Boot Test |
 
 ---
 
 ## 🏗️ Architecture
+┌────────────────────┐ REST/JSON + JWT ┌──────────────────────┐
+│ Flutter Client │ ──────────────────► │ Spring Boot API │
+│ (mobile/web/desktop)│ ◄────────────────── │ (context-path /api) │
+└─────────┬──────────┘ WebSocket/STOMP └──────────┬───────────┘
+│ │ JDBC
+│ ▼
+│ ┌──────────────┐
+│ │ MySQL 8.0 │
+│ └──────────────┘
+│ │
+│ ▼
+│ ┌──────────────┐
+└──────────────────────────────────►│ Stockage │
+│ local (uploads/)│
+└──────────────┘
 
-### Vue d'ensemble
+text
 
-```mermaid
-graph LR
-    A[Client Flutter<br/>mobile · web · desktop] -->|REST/JSON + JWT| B[API Spring Boot<br/>context-path /api]
-    A -->|STOMP| C[WebSocket<br/>STOMP/SockJS]
-    B -->|JDBC| D[(MySQL 8.0)]
-    B -->|Fichiers| E[Stockage local<br/>uploads/]
-    C --> D
+---
+
+## 📁 Structure du projet
+club-foot-app/
+├── backend/ # API Spring Boot
+│ ├── src/main/java/
+│ │ ├── controller/ # Contrôleurs REST
+│ │ ├── service/ # Logique métier
+│ │ ├── repository/ # Interfaces JPA
+│ │ ├── model/ # Entités JPA
+│ │ ├── dto/ # Objets de transfert
+│ │ ├── security/ # JWT, filtres, chiffrement
+│ │ ├── exception/ # Gestion centralisée des erreurs
+│ │ └── config/ # WebSocket, données initiales
+│ ├── src/main/resources/
+│ │ └── db/migration/ # Scripts SQL de migration
+│ └── uploads/ # Stockage local des fichiers
+├── frontend/ # Application Flutter
+│ └── lib/
+│ ├── config/ # URLs API centralisées
+│ ├── core/theme/ # Thèmes clair/sombre
+│ ├── models/ # Modèles de données
+│ ├── providers/ # Gestion d'état (Provider)
+│ ├── services/ # Appels HTTP
+│ ├── screens/ # Écrans par domaine métier
+│ └── widgets/ # Composants réutilisables
+├── .github/workflows/ # Pipelines CI/CD
+├── docker-compose.yml # Orchestration MySQL + backend
+└── .env.example # Modèle de variables d'environnement
+
+text
+
+---
+
+## 🚀 Lancement rapide
+
+### Prérequis
+
+- [Docker](https://docs.docker.com/get-docker/) & Docker Compose
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) ≥ 3.0
+- [Java 17](https://adoptium.net/) (pour le développement backend)
+
+### Démarrage
+
+```bash
+# 1. Cloner le dépôt
+git clone https://github.com/firdawsM7/club-foot-app.git
+cd club-foot-app
+
+# 2. Configurer les variables d'environnement
+cp .env.example .env
+# Éditer .env selon votre configuration
+
+# 3. Démarrer l'infrastructure (MySQL + backend)
+docker compose up -d
+
+# 4. Lancer le frontend Flutter
+cd frontend
+flutter pub get
+flutter run
+Note : l'URL de l'API est configurée automatiquement selon la plateforme :
+
+http://localhost:8084 → Web, Desktop, iOS
+
+http://10.0.2.2:8084 → Émulateur Android
+
+🔒 Sécurité
+Authentification JWT (expiration 24 h)
+
+Hashage des mots de passe avec BCrypt
+
+Validation et sanitisation des entrées (InputSanitizer)
+
+Protection contre le path traversal
+
+Rate limiting sur l'authentification (30 req / 60 s)
+
+CORS restreint
+
+Messages d'erreur génériques (pas de fuite d'information technique)
+
+🧪 Tests
+Tests unitaires : JwtUtil, MultiPasswordEncoder, SecureFileValidator, InputSanitizer, services métier
+
+Tests d'intégration : messagerie temps réel et notifications
+
+Tests de validation API : authentification, autorisation par rôle, CRUD, upload
+
+Tous les tests sont exécutés automatiquement dans le pipeline CI GitHub Actions.
+
+🔄 CI/CD
+Pipeline	Rôle
+CI (.github/workflows/ci.yml)	Build Maven + tests backend · Build image Docker · Build Flutter Web
+CD (.github/workflows/cd.yml)	Build & push de l'image Docker · Déploiement
+👥 Auteurs
+Siham TALBI
+
+Firdaws MASROUR
+
+Encadrant professionnel : M. Mohammed EL MOUTAOUKIL
+Organisme d'accueil : MAS de Fès
+Établissement : École Nationale des Sciences Appliquées — Filière 3IACN
+
+📄 Licence
+Projet académique — École Nationale des Sciences Appliquées, 2026-2027.
+
